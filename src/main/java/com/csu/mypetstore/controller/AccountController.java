@@ -84,16 +84,6 @@ public class AccountController {
     }
 
 
-    @Autowired
-    private SmsService smsService;
-
-    @PostMapping("/submit")
-    public String submitForm(@RequestParam("phone-number") String phoneNumber) {
-        String smsBody = "您的验证码是：12345";
-        smsService.sendSms(phoneNumber, smsBody);
-        return "success";
-    }
-
 
 
 

@@ -1,7 +1,6 @@
 package com.csu.mypetstore.config;
 
 import com.twilio.http.TwilioRestClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,6 +8,12 @@ import org.springframework.context.annotation.Configuration;
 public class TwilioConfig {
 
 
+    /**
+     * twilio平台发送短信验证码
+     * 因为是国外平台
+     * 被拦截了
+     * @return
+     */
     @Bean
     public TwilioRestClient twilioRestClient() {
         return new TwilioRestClient.Builder("AC172145598a55d4076fa6b094477d19a8",
