@@ -23,7 +23,7 @@ public class AccountController {
      * @param account
      * @return
      */
-    @PostMapping("/login")
+    @PostMapping("/login2")
     public Result<?> login(@RequestBody Account account) {
         //验证是否存在
         Account newAccount = accountService.getAccount(account.getUsername(),account.getPassword());
@@ -34,7 +34,17 @@ public class AccountController {
         }else {
             return Result.error("404","账户不存在");
         }
+    }
 
+    @PostMapping("/login")
+    public Result<?> login1(@RequestBody Account account) {
+        //验证是否存在
+        Account newAccount = accountService.getAccount(account.getUsername(),account.getPassword());
+        if (newAccount != null){
+            return Result.success(account);
+        }else {
+            return Result.error("404","账户不存在");
+        }
     }
 
     /**
@@ -69,8 +79,13 @@ public class AccountController {
      */
     @PostMapping("new")
     public Result<?> newAccount(@RequestBody Account account) throws SQLException {
-        accountService.insertAccount(account);
-        return Result.success();
+        if (accountService.getAccount(account.getUsername()) != null){
+            return Result.error("1","账号已存在");
+        }else {
+            accountService.insertAccount(account);
+            return Result.success();
+        }
+
     }
 
     //注册是使用，检查用户名是否存在

@@ -6,13 +6,18 @@ import com.csu.mypetstore.util.VerCodeGenerateUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -29,7 +34,8 @@ public class EmailController {
     @Resource
     private JavaMailSender javaMailSender;
 
-
+    @Resource
+    RedisTemplate<String,String> redisTemplate;
 
 
 
@@ -43,8 +49,8 @@ public class EmailController {
      * @param toEmail
      * @return
      */
-    @RequestMapping("sendEmail")
-    public Result<?> commonEmail(ToEmail toEmail) {
+    @PostMapping("sendEmail")
+    public Result<?> sendEmail(ToEmail toEmail) {
 //        创建邮件消息
         SimpleMailMessage message = new SimpleMailMessage();
 
@@ -64,6 +70,25 @@ public class EmailController {
         javaMailSender.send(message);
 //        User user = QcbyContext.getUser(request.getHeader("token"));
 //        user.setVerCode(verCode);
-        return Result.success("发送成功");
+
+        //过期时间5分钟
+        redisTemplate.opsForValue().set(toEmail.getTos()[0],verCode,5,TimeUnit.MINUTES);
+        return Result.success("发送成功" + toEmail.getTos()[0]);
+    }
+
+    @GetMapping("/checkEmail")
+    public Result<?> checkEmail(ToEmail toEmail,String verCode) {
+        String getCode = redisTemplate.opsForValue().get(toEmail.getTos()[0]);
+        if (getCode != null && getCode.toLowerCase().equals(verCode.toLowerCase())){
+            //验证后删除对应key
+            redisTemplate.delete(toEmail.getTos()[0]);
+            return Result.success(verCode);
+        }else {
+            System.out.println(redisTemplate.opsForValue().get(toEmail.getTos()[0]));
+            return Result.error("50","验证码错误");
+        }
+//        System.out.println(redisTemplate.opsForValue().get(toEmail.getTos()[0]));
+//        return Result.success(redisTemplate.opsForValue().get(toEmail.getTos()[0]));
+
     }
 }
