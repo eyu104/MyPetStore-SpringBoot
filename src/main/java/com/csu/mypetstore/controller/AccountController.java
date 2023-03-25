@@ -41,7 +41,7 @@ public class AccountController {
         //验证是否存在
         Account newAccount = accountService.getAccount(account.getUsername(),account.getPassword());
         if (newAccount != null){
-            return Result.success(account);
+            return Result.success(newAccount);
         }else {
             return Result.error("404","账户不存在");
         }
@@ -85,7 +85,6 @@ public class AccountController {
             accountService.insertAccount(account);
             return Result.success();
         }
-
     }
 
     //注册是使用，检查用户名是否存在
