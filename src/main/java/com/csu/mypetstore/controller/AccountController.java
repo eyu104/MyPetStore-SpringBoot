@@ -2,14 +2,18 @@ package com.csu.mypetstore.controller;
 
 import com.csu.mypetstore.config.Result;
 import com.csu.mypetstore.domain.Account;
+import com.csu.mypetstore.domain.Cart;
 import com.csu.mypetstore.service.AccountService;
 import com.csu.mypetstore.service.SmsService;
 import com.csu.mypetstore.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/account")
@@ -17,6 +21,7 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+
 
     /**
      * 验证登录返回token
@@ -46,6 +51,8 @@ public class AccountController {
             return Result.error("404","账户不存在");
         }
     }
+
+
 
     /**
      * 通过token获得用户信息

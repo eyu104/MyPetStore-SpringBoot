@@ -1,11 +1,13 @@
 package com.csu.mypetstore.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.logging.Logger;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Cart implements Serializable {
     Account account=new Account();
 //    Logger logger = Logger.getLogger(Cart.class);

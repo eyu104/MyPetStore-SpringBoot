@@ -22,13 +22,13 @@ public class CategoryController {
 
     /**
      * 获得宠物种类
-     * @param categoryId
+     * @param
      * @return
      */
     @GetMapping("/findCate")
-    public Result<?> getCatelog(@RequestParam String categoryId) {
-        Category category = catalogService.getCategory(categoryId);
-        return Result.success(category);
+    public Result<?> getCatelog() {
+        List<Category> categoryList = catalogService.getCategoryList();
+        return Result.success(categoryList);
     }
 
     /**
