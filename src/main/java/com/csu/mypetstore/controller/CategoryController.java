@@ -64,5 +64,12 @@ public class CategoryController {
         return Result.success(item);
     }
 
+    @GetMapping("/productAuto")
+    public Result<?> productAuto(@RequestParam String keyword){
+        List<Product> productList = catalogService.searchProductList(keyword);
+        return Result.success(productList);
+    }
+
+
 
 }
