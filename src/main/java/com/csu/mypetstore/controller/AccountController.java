@@ -3,9 +3,12 @@ package com.csu.mypetstore.controller;
 import com.csu.mypetstore.config.Result;
 import com.csu.mypetstore.domain.Account;
 import com.csu.mypetstore.domain.Cart;
+import com.csu.mypetstore.domain.vo.AccountVO;
 import com.csu.mypetstore.service.AccountService;
 import com.csu.mypetstore.service.SmsService;
 import com.csu.mypetstore.util.JwtUtil;
+import com.csu.mypetstore.util.JwtUtil2;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -13,6 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -21,6 +28,9 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private JwtUtil2 jwtUtil2;
 
 
     /**
@@ -46,9 +56,24 @@ public class AccountController {
         //验证是否存在
         Account newAccount = accountService.getAccount(account.getUsername(),account.getPassword());
         if (newAccount != null){
-            return Result.success(newAccount);
+            AccountVO accountVO = new AccountVO();
+            BeanUtils.copyProperties(newAccount,accountVO);
+            // 将新的token存入redis
+            Map<Object, Object> newToken = new HashMap<>();
+            // 用户信息加密token，包含用户电话，用户角色信息
+            Map<String, Object> chaim = new HashMap<>();
+            List<String> roles = new ArrayList<>();
+            roles.add("account");
+            chaim.put("username",accountVO.getUsername());
+            chaim.put("role",roles);
+            String jwtToken = jwtUtil2.encode(accountVO.getUsername(),24 * 60 * 60 * 1000,chaim);
+            System.out.println(jwtToken);
+            newToken.put("token", jwtToken);
+            jwtUtil2.addTokenToCache(newToken);
+            accountVO.setToken(jwtToken);
+            return Result.success(accountVO);
         }else {
-            return Result.error("404","账户不存在");
+            return Result.error("401","账户不存在");
         }
     }
 
@@ -103,6 +128,8 @@ public class AccountController {
             return Result.success();
         }
     }
+
+
 
 
 

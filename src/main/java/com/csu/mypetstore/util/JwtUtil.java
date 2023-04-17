@@ -38,7 +38,11 @@ public class JwtUtil {
     }
 
     public static void main(String[] args) {
+        String token = JwtUtil.generateToken("hahaha123");
+        System.out.println(token);
 
+        Claims usernam = JwtUtil.getClaimsByToken(token);
+        System.out.println(usernam);
     }
 
 }

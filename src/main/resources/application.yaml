@@ -1,6 +1,9 @@
 
 
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/mypetstore?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
@@ -44,3 +47,5 @@ server:
         max-idle: 10
         max-wait: -1
 
+swagger:
+  show: true
