@@ -1,6 +1,7 @@
 package com.csu.mypetstore.controller;
 
 import com.csu.mypetstore.config.Result;
+import com.csu.mypetstore.domain.DTO.EmailDTO;
 import com.csu.mypetstore.domain.ToEmail;
 import com.csu.mypetstore.util.VerCodeGenerateUtil;
 
@@ -9,10 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -77,7 +75,12 @@ public class EmailController {
     }
 
     @GetMapping("/checkEmail")
-    public Result<?> checkEmail(ToEmail toEmail,String verCode) {
+    public Result<?> checkEmail(@RequestParam("tos") String tos1,@RequestParam String verCode) {
+        ToEmail toEmail = new ToEmail();
+        String[] tos = new String[1];
+        tos[0] = tos1;
+        toEmail.setTos(tos);
+
         String getCode = redisTemplate.opsForValue().get(toEmail.getTos()[0]);
         if (getCode != null && getCode.toLowerCase().equals(verCode.toLowerCase())){
             //验证后删除对应key

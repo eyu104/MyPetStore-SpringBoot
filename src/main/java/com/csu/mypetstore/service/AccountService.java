@@ -1,11 +1,14 @@
 package com.csu.mypetstore.service;
 
 import com.csu.mypetstore.domain.Account;
+import com.csu.mypetstore.domain.DO.AccountDO;
+import com.csu.mypetstore.mapper.AccountDOMapper;
 import com.csu.mypetstore.mapper.AccountMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +21,8 @@ public class AccountService {
     private static final List<String> CATEGORY_LIST;
     @Autowired
     private AccountMapper accountMapper;
+    @Resource
+     private AccountDOMapper accountDOMapper;
 
     static {
         List<String> langList = new ArrayList<String>();
@@ -64,7 +69,9 @@ public class AccountService {
     @Transactional
     public void updateAccount(Account account) throws SQLException {
         accountMapper.updateAccount(account);
-        accountMapper.updateProfile(account);
+        AccountDO accountDO = new AccountDO(account);
+        accountDOMapper.updateById(accountDO);
+        
 
         if (account.getPassword() != null && account.getPassword().length() > 0) {
             accountMapper.updateSignon(account);

@@ -1,6 +1,7 @@
 package com.csu.mypetstore.mapper;
 
 import com.csu.mypetstore.domain.Account;
+import com.csu.mypetstore.domain.DO.AccountDO;
 import org.apache.ibatis.annotations.Mapper;
 import java.sql.SQLException;
 
@@ -19,7 +20,7 @@ public interface AccountMapper {
 
     void updateAccount(Account account) throws SQLException;
 
-    void updateProfile(Account account);
+    void updateProfile(AccountDO account);
 
     void updateSignon(Account account);
 }

@@ -91,10 +91,12 @@
         WHERE USERID = #{username}
     </update>
 
-    <update id="updateProfile" parameterType="account">
+    <update id="updateProfile" parameterType="com.csu.mypetstore.domain.DO.AccountDO">
         UPDATE PROFILE SET
                            LANGPREF = #{languagePreference},
-                           FAVCATEGORY = #{favouriteCategoryId}
+                           FAVCATEGORY = #{favouriteCategoryId},
+                           mylistopt = 1，
+                           banneropt = 1
         WHERE USERID = #{username}
     </update>
 

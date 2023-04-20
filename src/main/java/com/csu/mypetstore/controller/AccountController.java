@@ -8,6 +8,7 @@ import com.csu.mypetstore.service.AccountService;
 import com.csu.mypetstore.service.SmsService;
 import com.csu.mypetstore.util.JwtUtil;
 import com.csu.mypetstore.util.JwtUtil2;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,17 +80,28 @@ public class AccountController {
     }
 
 
-
     /**
-     * 通过token获得用户信息
-     * @param token
+     * token获取用户名
+     * 存入sessionStore
+     * @param request
      * @return
      */
     @GetMapping("/info")
-    public Result<?> getInfo(@RequestParam String token) {
-        String username = JwtUtil.getClaimsByToken(token).getSubject();
-        Account account = accountService.getAccount(username);
-        return Result.success(account);
+    public Result<?> getInfo(HttpServletRequest request) {
+        String jwtToken = request.getHeader("Authorization");
+
+        Claims claims = jwtUtil2.decode(jwtToken);
+
+        String username = (String) claims.get("username");
+        Map<Object,Object> newtoken = jwtUtil2.getTokenFromCache(username);
+        String t = (String) newtoken.get("token");
+        if (jwtToken.equals(t)){
+            Account account = accountService.getAccount(username);
+            return Result.success(account);
+        }else {
+            return Result.error("400","已过期");
+        }
+
     }
 
     /**
@@ -99,6 +112,8 @@ public class AccountController {
      */
     @PostMapping("/edit")
     public Result<?> editAccount(@RequestBody Account account) throws SQLException {
+        System.out.println(account);
+
         accountService.updateAccount(account);
         return Result.success(account);
     }
@@ -109,7 +124,7 @@ public class AccountController {
      * @return
      * @throws SQLException
      */
-    @PostMapping("new")
+    @PostMapping("/new")
     public Result<?> newAccount(@RequestBody Account account) throws SQLException {
         if (accountService.getAccount(account.getUsername()) != null){
             return Result.error("1","账号已存在");
@@ -130,7 +145,15 @@ public class AccountController {
     }
 
 
+    @GetMapping("/logout")
+    public Result<?> logout(HttpServletRequest request) {
+        String jwtToken = request.getHeader("Authorization");
 
+        Claims claims = jwtUtil2.decode(jwtToken);
+        String username = (String) claims.get("username");
+        jwtUtil2.deleteToken(username);
+        return Result.success("log out success");
+    }
 
 
 
